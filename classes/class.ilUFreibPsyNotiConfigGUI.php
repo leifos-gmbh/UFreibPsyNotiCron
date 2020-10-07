@@ -119,6 +119,7 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
         $form->addItem($event_select);
 
         $repos = new ilRepositorySelector2InputGUI($this->plugin->txt("scorm_object"), "scorm_ref_id");
+        $repos->setRequired(true);
         $definition = $GLOBALS['DIC']['objDefinition'];
         $white_list = [];
         foreach ($definition->getAllRepositoryTypes() as $type) {
@@ -151,9 +152,11 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
         $form->addItem($recipient);
 
         $reminder_day = new ilNumberInputGUI($this->plugin_object->txt("days_to_reminder"), "reminder_after_x_days");
+        $reminder_day->setRequired(true);
         $form->addItem($reminder_day);
 
         $text = new ilTextAreaInputGUI($this->lng->txt("udf_type_text"), "text");
+        $text->setRequired(true);
         $form->addItem($text);
 
         $form->addCommandButton("saveNotificationSetting", $this->lng->txt("save"));
