@@ -1,0 +1,17 @@
+<!-- language file start -->
+notification_id#:#Benachrichtigungs-ID
+event_type#:#Eventart
+recipient_type#:#Empfängerart
+scorm_object#:#SCORM-Objekt
+days_to_reminder#:#Tage bis Erinnerungsversendung
+notifications#:#Benachrichtigungen
+notification_form#:#Benachrichtigungsformular
+add_notification#:#Benachrichtigung hinzufügen
+scorm_object#:#SCORM Objekt
+scorm_access#:#SCORM Zugriff
+scorm_completed#:#SCORM Abschluss
+scorm_unfinished#:#SCORM nicht beendet
+recipient_students#:#Studenten
+recipient_ecoaches#:#E-Coaches
+recipient_accounts#:#Spezifische Accounts
+recipient_accounts_info#:#Bitte fügen Sie die gewünschten Empfänger-Accounts als kommaseparierte Liste ein

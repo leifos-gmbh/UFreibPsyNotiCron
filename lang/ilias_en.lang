@@ -1,0 +1,17 @@
+<!-- language file start -->
+notification_id#:#Notification-ID
+event_type#:#Event type
+recipient_type#:#Recipient type
+scorm_object#:#SCORM object
+days_to_reminder#:#Days until reminder is sent
+notifications#:#Notifications
+notification_form#:#Notification form
+add_notification#:#Add Notification
+scorm_object#:#SCORM object
+scorm_access#:#SCORM Access
+scorm_completed#:#SCORM Completion
+scorm_unfinished#:#SCORM not finished
+recipient_students#:#Students
+recipient_ecoaches#:#E-Coaches
+recipient_accounts#:#Specific Accounts
+recipient_accounts_info#:#Please enter the recipient accounts as a comma-separated list
