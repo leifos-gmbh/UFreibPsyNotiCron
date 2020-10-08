@@ -203,42 +203,83 @@ class ilUFreibPsyNotification
     public function create()
     {
         $id = $this->db->nextId("ufreibpsy_notification");
-        $event_type     = $this->db->quote($this->event_type, "integer");
-        $recipient_type = $this->db->quote($this->recipient_type, "integer");
-        $scorm_ref_id   = $this->db->quote($this->scorm_ref_id,"integer");
-        if (is_string($this->recipient_accounts)) {
-            $recipient_account = $this->db->quote($this->recipient_accounts, "text");
+
+        $quotes = $this->getQuotedValues();
+        $event_type         = $quotes["event_type"];
+        $recipient_type     = $quotes["recipient_type"];
+        $scorm_ref_id       = $quotes["scorm_ref_id"];
+        $recipient_accounts = $quotes["recipient_accounts"];
+        $reminder_after     = $quotes["reminder_after"];
+        $text               = $quotes["text"];
+
+        $query = "INSERT INTO ufreibpsy_notification (notification_id, event_type, recipient_type, scorm_ref_id,";
+
+        if(!empty($recipient_accounts)) {
+            $query .= "recipient_accounts,";
         }
-        $reminder_after = $this->db->quote($this->reminder_after_x_days, "integer");
-        $text = $this->db->quote($this->text, "text");
-        if(!empty($this->id)) {
-            $this->db->manipulate("INSERT INTO ufreibpsy_notification (notification_id, event_type, recipient_type, scorm_ref_id, recipient_accounts, reminder_after_x_days, text) 
-                                     VALUES ($id, $event_type, $recipient_type, $scorm_ref_id,$recipient_account, $reminder_after, $text)");
+
+        $query .= "reminder_after_x_days, text) VALUES ($id, $event_type, $recipient_type, $scorm_ref_id,";
+
+        if(!empty($recipient_accounts)) {
+            $query .= "$recipient_accounts,";
         }
+
+        $query .= "$reminder_after, $text)";
+
+
+        $this->db->manipulate($query);
+
     }
 
     public function update()
     {
-        $event_type     = $this->db->quote($this->event_type, "integer");
-        $recipient_type = $this->db->quote($this->recipient_type, "integer");
-        $scorm_ref_id   = $this->db->quote($this->scorm_ref_id,"integer");
-        if (is_string($this->recipient_accounts)) {
-            $recipient_account = $this->db->quote($this->recipient_accounts, "text");
+        $quotes = $this->getQuotedValues();
+        $event_type         = $quotes["event_type"];
+        $recipient_type     = $quotes["recipient_type"];
+        $scorm_ref_id       = $quotes["scorm_ref_id"];
+        $recipient_accounts = $quotes["recipient_accounts"];
+        $reminder_after     = $quotes["reminder_after"];
+        $text               = $quotes["text"];
+
+        $query = "UPDATE ufreibpsy_notification SET event_type = $event_type, recipient_type = $recipient_type, scorm_ref_id = $scorm_ref_id,";
+
+        if(!empty($recipient_accounts)) {
+            $query .= "recipient_accounts = $recipient_accounts,";
         }
-        $reminder_after = $this->db->quote($this->reminder_after_x_days, "integer");
-        $text = $this->db->quote($this->text, "text");
+
+        $query .= "reminder_after_x_days = $reminder_after, text = $text WHERE id = $this->id";
+
         if(!empty($this->id)) {
-            $this->db->manipulate("UPDATE ufreibpsy_notification
-                                     SET event_type = $event_type, recipient_type = $recipient_type, scorm_ref_id = $scorm_ref_id, recipient_accounts = $recipient_account, reminder_after_x_days = $reminder_after, text = $text 
-                                     WHERE id = $this->id");
+            $this->db->manipulate($query);
         }
     }
 
     public function delete()
     {
-        if(!empty($this->id) && !empty($this->event_type)) {
+        if(!empty($this->id)) {
             $this->db->manipulate("DELETE FROM ufreibpsy_notification WHERE id = $this->id;");
         }
+    }
+
+    private function getQuotedValues()
+    {
+        $quoted_values = [
+            "event_type"     => $this->db->quote($this->event_type, "integer"),
+            "recipient_type" => $this->db->quote($this->recipient_type, "integer"),
+            "scorm_ref_id"   => $this->db->quote($this->scorm_ref_id,"integer"),
+            "reminder_after" => $this->db->quote($this->reminder_after_x_days, "integer"),
+            "text"           => $this->db->quote($this->text, "text")
+        ];
+
+        if (is_string($this->recipient_accounts)) {
+            $quoted_values['recipient_accounts'] = $this->db->quote($this->recipient_accounts, "text");
+        } else {
+            $quoted_values['recipient_accounts'] = null;
+        }
+
+
+        return $quoted_values;
+
     }
 
 }

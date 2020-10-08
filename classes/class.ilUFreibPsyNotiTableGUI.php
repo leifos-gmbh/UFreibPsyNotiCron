@@ -39,7 +39,6 @@ class ilUFreibPsyNotiTableGUI extends ilTable2GUI
 
         $notification_ids = ilUFreibPsyNotification::lookupNotificationIds();
 
-
         $n = 0;
         $tbl_data = array();
         foreach ($notification_ids as $notification_id) {

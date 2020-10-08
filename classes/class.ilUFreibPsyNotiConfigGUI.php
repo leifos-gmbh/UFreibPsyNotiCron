@@ -87,7 +87,7 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
 
 	protected function createNotificationSetting(ilPropertyFormGUI $form = null)
     {
-        if (!isset($form)) {
+        if (is_null($form)) {
             $form = $this->initNotificationForm();
         }
         $this->main_tpl->setContent($form->getHTML());
@@ -95,7 +95,7 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
 
     protected function editNotificationSetting(ilPropertyFormGUI $form = null)
     {
-        if (!isset($form)) {
+        if (is_null($form)) {
             $form = $this->initNotificationForm();
         }
         $this->main_tpl->setContent($form->getHTML());
@@ -177,21 +177,59 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
         $this->main_tpl->setContent($table->getHTML());
     }
 
-    //TODO: This...
     private function saveNotificationSetting()
+    {
+
+        $form = $this->initNotificationForm();
+        if (!$form->checkInput()) {
+            $form->setValuesByPost();
+            ilUtil::sendFailure($this->lng->txt("err_check_input"));
+            return $this->createNotificationSetting($form);
+        }
+
+        //initiate notification instance and set values
+        $notification = new ilUFreibPsyNotification();
+        $notification->setEventType($form->getInput("event_type"));
+        $notification->setRecipientType($form->getInput("recipient_type"));
+        $notification->setScormRefId($form->getInput("scorm_ref_id"));
+        if(!empty($form->getInput("recipient_accounts"))) {
+            $notification->setRecipientAccounts($form->getInput("recipient_accounts"));
+        }
+        $notification->setReminderAfterXDays($form->getInput("reminder_after_x_days"));
+        $notification->setText($form->getInput("text"));
+
+        //insert notification values into DB
+        $notification->create();
+
+        ilUtil::sendSuccess($this->lng->txt("notification_saved"));
+        $this->ctrl->redirect($this, "listNotifications");
+    }
+
+    private function updateNotificationSetting()
     {
         $form = $this->initNotificationForm();
         if (!$form->checkInput()) {
             $form->setValuesByPost();
             ilUtil::sendFailure($this->lng->txt("err_check_input"));
-            $this->createNotificationSetting();
+            return $this->createNotificationSetting($form);
         }
-        return null;
-    }
 
-    private function updateNotificationSetting()
-    {
+        //initiate notification instance and set values
+        $notification = new ilUFreibPsyNotification();
+        $notification->setEventType($form->getInput("event_type"));
+        $notification->setRecipientType($form->getInput("recipient_type"));
+        $notification->setScormRefId($form->getInput("scorm_ref_id"));
+        if(!empty($form->getInput("recipient_accounts"))) {
+            $notification->setRecipientAccounts($form->getInput("recipient_accounts"));
+        }
+        $notification->setReminderAfterXDays($form->getInput("reminder_after_x_days"));
+        $notification->setText($form->getInput("text"));
 
+        //update notification values in DB
+        $notification->update();
+
+        ilUtil::sendSuccess($this->lng->txt("notification_saved"));
+        $this->ctrl->redirect($this, "listNotifications");
     }
 
 }
