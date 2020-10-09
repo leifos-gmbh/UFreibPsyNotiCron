@@ -256,8 +256,12 @@ class ilUFreibPsyNotification
 
     public function delete()
     {
+        global $DIC;
+
+        $DIC->logger()->usr()->dump($this->id);
+
         if(!empty($this->id)) {
-            $this->db->manipulate("DELETE FROM ufreibpsy_notification WHERE id = $this->id;");
+            $this->db->manipulate("DELETE FROM ufreibpsy_notification WHERE notification_id = $this->id;");
         }
     }
 

@@ -95,6 +95,10 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
 
     protected function editNotificationSetting(ilPropertyFormGUI $form = null)
     {
+        global $DIC;
+
+
+
         if (is_null($form)) {
             $form = $this->initNotificationForm();
         }
@@ -228,7 +232,80 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
         //update notification values in DB
         $notification->update();
 
-        ilUtil::sendSuccess($this->lng->txt("notification_saved"));
+        ilUtil::sendSuccess($this->plugin_object->txt("notification_saved"));
+        $this->ctrl->redirect($this, "listNotifications");
+    }
+
+
+    public function confirmDelete()
+    {
+        global $DIC;
+
+        $request = $DIC->http()->request();
+
+        $DIC->logger()->usr()->dump($request->getParsedBody());
+
+        $notification_ids[] = $request->getQueryParams()["notification_id"];
+
+        $cgui = new ilConfirmationGUI();
+        $cgui->setFormAction($this->ctrl->getFormAction($this));
+        $cgui->setHeaderText($this->lng->txt("info_delete_sure"));
+        foreach ($notification_ids as $notification_id) {
+            $notification = new ilUFreibPsyNotification($notification_id);
+
+            switch ($notification->getEventType()) {
+                case ilUFreibPsyNotiPlugin::EVENT_TYPE_SCORM_ACCESS:
+                    $event_type = $this->plugin_object->txt("scorm_access");
+                    break;
+                case ilUFreibPsyNotiPlugin::EVENT_TYPE_SCORM_COMPLETED:
+                    $event_type = $this->plugin_object->txt("scorm_completed");
+                    break;
+                case ilUFreibPsyNotiPlugin::EVENT_TYPE_SCORM_NOT_FINISHED:
+                    $event_type = $this->plugin_object->txt("scorm_unfinished");
+                    break;
+                default:
+                    break;
+            }
+
+            switch ($notification->getRecipientType()) {
+                case ilUFreibPsyNotiPlugin::RECIPIENT_TYPE_STUDENT:
+                    $recipient_type = $this->plugin_object->txt("recipient_students");
+                    break;
+                case ilUFreibPsyNotiPlugin::RECIPIENT_TYPE_ECOACHES:
+                    $recipient_type = $this->plugin_object->txt("recipient_ecoaches");
+                    break;
+                case ilUFreibPsyNotiPlugin::RECIPIENT_TYPE_ACCOUNTS:
+                    $recipient_type = $this->plugin_object->txt("recipient_accounts");
+                    break;
+                default:
+                    break;
+            }
+
+            $scorm_obj_title = ilObject::_lookupTitle(ilObject::_lookupObjectId($notification->getScormRefId()));
+
+            $cgui->addItem("notification_id[]", $notification_id, sprintf($this->plugin_object->txt("notification_conc_desc"), $event_type, $recipient_type, $scorm_obj_title, $notification_id));
+        }
+        $cgui->setCancel($this->lng->txt("cancel"), "listNotifications");
+        $cgui->setConfirm($this->lng->txt("delete"), "deleteNotification");
+
+
+        $this->main_tpl->setContent($cgui->getHTML());
+    }
+
+    private function deleteNotification()
+    {
+        global $DIC;
+
+        $request = $DIC->http()->request();
+
+        $notification_ids = $request->getParsedBody()['notification_id'];
+
+        foreach ($notification_ids as $notification_id) {
+            $notification = new ilUFreibPsyNotification($notification_id);
+            $notification->delete();
+        }
+
+        ilUtil::sendSuccess($this->plugin_object->txt("notification_deleted"));
         $this->ctrl->redirect($this, "listNotifications");
     }
 

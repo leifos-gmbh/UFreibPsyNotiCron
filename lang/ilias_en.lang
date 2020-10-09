@@ -16,3 +16,5 @@ recipient_ecoaches#:#E-Coaches
 recipient_accounts#:#Specific Accounts
 recipient_accounts_info#:#Please enter the recipient accounts as a comma-separated list
 notification_saved#:#Notification successfully saved
+notification_saved#:#Notification successfully deleted
+notification_conc_desc#:#Event-Type: %s, Recipient-Type: %s, SCORM object: %s (ID: %s)
