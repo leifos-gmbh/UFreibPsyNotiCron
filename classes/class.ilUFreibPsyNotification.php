@@ -247,7 +247,7 @@ class ilUFreibPsyNotification
             $query .= "recipient_accounts = $recipient_accounts,";
         }
 
-        $query .= "reminder_after_x_days = $reminder_after, text = $text WHERE id = $this->id";
+        $query .= "reminder_after_x_days = $reminder_after, text = $text WHERE notification_id = $this->id";
 
         if(!empty($this->id)) {
             $this->db->manipulate($query);

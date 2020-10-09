@@ -20,7 +20,7 @@ class ilUFreibPsyNotiTableGUI extends ilTable2GUI
     {
         $this->setTitle($this->lng->txt("notifications"));
 
-        $this->addColumn("");
+        $this->addColumn('', '', '1', true);
         $this->addColumn($this->plugin_object->txt("notification_id"), "notification_id");
         $this->addColumn($this->plugin_object->txt("event_type"), "event_type");
         $this->addColumn($this->plugin_object->txt("recipient_type"), "recipient_type");
@@ -29,9 +29,8 @@ class ilUFreibPsyNotiTableGUI extends ilTable2GUI
         $this->addColumn($this->plugin_object->txt("days_to_reminder"), "reminder_after_x_days");
         $this->addColumn($this->lng->txt("udf_type_text"), "text");
         $this->addColumn($this->lng->txt("actions"));
-        $this->setRowTemplate($this->plugin_object->getDirectory()."/templates/tpl.notification_row.html");
 
-        $this->addCommandButton("confirmDelete", $this->lng->txt("delete"), "", "", "ilUFreibPsyNotiConfigGUI");
+        $this->setRowTemplate($this->plugin_object->getDirectory()."/templates/tpl.notification_row.html");
     }
 
 

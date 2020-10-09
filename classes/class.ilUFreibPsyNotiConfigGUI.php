@@ -96,17 +96,18 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
     protected function editNotificationSetting(ilPropertyFormGUI $form = null)
     {
         global $DIC;
-
-
+        $request = $DIC->http()->request();
 
         if (is_null($form)) {
-            $form = $this->initNotificationForm();
+            $notification_id = $request->getQueryParams()["notification_id"];
+            $form = $this->initNotificationForm("updateNotificationSetting", $notification_id);
         }
         $this->main_tpl->setContent($form->getHTML());
     }
 
-	private function initNotificationForm($id = null)
+	private function initNotificationForm($save_cmd = "saveNotificationSetting", $id = null)
     {
+
         $form = new ilPropertyFormGUI();
 
         $form->setTitle($this->plugin->txt("notification_form"));
@@ -120,6 +121,7 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
            ilUFreibPsyNotiPlugin::EVENT_TYPE_SCORM_COMPLETED => $this->plugin->txt("scorm_completed"),
            ilUFreibPsyNotiPlugin::EVENT_TYPE_SCORM_NOT_FINISHED => $this->plugin->txt("scorm_unfinished")
         ]);
+
         $form->addItem($event_select);
 
         $repos = new ilRepositorySelector2InputGUI($this->plugin->txt("scorm_object"), "scorm_ref_id");
@@ -151,6 +153,7 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
 
         $acc_list_input = new ilTextInputGUI($this->plugin->txt("recipient_accounts"), "recipient_accounts");
         $acc_list_input->setInfo($this->plugin->txt("recipient_accounts_info"));
+        $acc_list_input->setRequired(true);
         $accounts->addSubItem($acc_list_input);
         $recipient->addOption($accounts);
         $form->addItem($recipient);
@@ -163,7 +166,21 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
         $text->setRequired(true);
         $form->addItem($text);
 
-        $form->addCommandButton("saveNotificationSetting", $this->lng->txt("save"));
+        if (!empty($id)) {
+            $notification = new ilUFreibPsyNotification($id);
+            $notification_id = new ilHiddenInputGUI("notification_id");
+            $notification_id->setValue($id);
+            $form->addItem($notification_id);
+
+            $event_select->setValue($notification->getEventType());
+            $repos->setValue($notification->getScormRefId());
+            $recipient->setValue($notification->getRecipientType());
+            $acc_list_input->setValue($notification->getRecipientAccounts());
+            $reminder_day->setValue($notification->getReminderAfterXDays());
+            $text->setValue($notification->getText());
+        }
+
+        $form->addCommandButton($save_cmd, $this->lng->txt("save"));
         $form->addCommandButton("listNotifications", $this->lng->txt("cancel"));
 
         return $form;
@@ -177,6 +194,9 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
         $this->toolbar->addButtonInstance($button);
 
         $table = new ilUFreibPsyNotiTableGUI($this, "listNotifications", $this->plugin_object);
+        //TODO: Checkbox und Command wollen nicht funktionieren.
+        $table->setSelectAllCheckbox("notifications");
+        $table->addMultiCommand("confirmDelete", $this->lng->txt("delete"));
 
         $this->main_tpl->setContent($table->getHTML());
     }
@@ -211,20 +231,23 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
 
     private function updateNotificationSetting()
     {
-        $form = $this->initNotificationForm();
+        //TODO: Bugfix: Bei Speicherversuch nach initialem Fehler durch Nichtausfüllen von Inputs, können Eingaben garnicht mehr gespeichert werden. (Speichervorgang bringt einen zurück zur Tabelle, aber ohne Update)
+        $form = $this->initNotificationForm("updateNotificationSetting");
         if (!$form->checkInput()) {
             $form->setValuesByPost();
             ilUtil::sendFailure($this->lng->txt("err_check_input"));
-            return $this->createNotificationSetting($form);
+            return $this->editNotificationSetting($form);
         }
 
         //initiate notification instance and set values
-        $notification = new ilUFreibPsyNotification();
+        $notification = new ilUFreibPsyNotification($form->getInput("notification_id"));
         $notification->setEventType($form->getInput("event_type"));
         $notification->setRecipientType($form->getInput("recipient_type"));
         $notification->setScormRefId($form->getInput("scorm_ref_id"));
-        if(!empty($form->getInput("recipient_accounts"))) {
+        if(!empty($form->getInput("recipient_accounts")) && $form->getInput("recipient_type") == ilUFreibPsyNotiPlugin::RECIPIENT_TYPE_ACCOUNTS) {
             $notification->setRecipientAccounts($form->getInput("recipient_accounts"));
+        } else {
+            $notification->setRecipientAccounts("");
         }
         $notification->setReminderAfterXDays($form->getInput("reminder_after_x_days"));
         $notification->setText($form->getInput("text"));
