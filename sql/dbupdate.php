@@ -82,3 +82,43 @@ if (!$ilDB->tableColumnExists('ufreibpsy_notification', 'subject')) {
     ));
 }
 ?>
+<#4>
+<?php
+$notification_fields = array(
+    'user_id' => array (
+        'type' => 'integer',
+        'length' => 4,
+        'notnull' => true
+    ),
+    'scorm_ref_id' => array(
+        'type' => 'integer',
+        'length' => 4,
+        'notnull' => true
+    ),
+    'access_granted_ts' => array(
+        'type' => 'integer',
+        'length' => 4,
+        'notnull' => true
+    ),
+    'reminder_sent_ts' => array(
+        'type' => 'integer',
+        'length' => 4,
+        'notnull' => true,
+        'default' => 0
+    )
+);
+$ilDB->createTable("ufreibpsy_access_store", $notification_fields);
+$ilDB->addPrimaryKey("ufreibpsy_access_store", array("user_id", "scorm_ref_id"));
+
+?>
+<#5>
+<?php
+if (!$ilDB->tableColumnExists('ufreibpsy_events', 'completed')) {
+    $ilDB->addTableColumn('ufreibpsy_events', 'completed', array(
+        'type' => 'integer',
+        'notnull' => false,
+        'length' => 1,
+        'default' => 0
+    ));
+}
+?>

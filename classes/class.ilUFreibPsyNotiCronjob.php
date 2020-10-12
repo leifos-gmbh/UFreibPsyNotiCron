@@ -80,6 +80,19 @@ class ilUFreibPsyNotiCronjob extends ilCronJob
     {
         $result = new ilCronJobResult();
 
+        $plugin = $this->getPlugin();
+        $plugin->includeClass("class.ilUFreibPsyNotiAccessRepository.php");
+        $access_repo = new ilUFreibPsyNotiAccessRepository();
+        $plugin->includeClass("class.ilUFreibPsyNotiAccessRepository.php");
+        $handler = new ilUFreibEventHandler($plugin);
+
+
+        // @todo: loop for all EVENT_TYPE_SCORM_NOT_FINISHED
+
+
+        foreach ($access_repo->getUserToNotify($days, $scorm_ref_id) as $student_id) {
+            // @todo: send mail using $handler->sendMail();
+        }
 
 
         \ilLoggerFactory::getLogger('otxt')->info('Cron job result is: ' . $result->getCode());

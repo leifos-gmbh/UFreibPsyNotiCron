@@ -88,4 +88,12 @@ class ilUFreibPsyNotiPlugin extends ilCronHookPlugin
     {
         return new ilUFreibPsyNotiCronjob();
     }
+
+    public function handleEvent($a_component, $a_event, $a_parameter)
+    {
+        $this->includeClass("class.ilUFreibEventHandler.php");
+        $event_handler = new ilUFreibEventHandler($this);
+        $event_handler->handleEvent($a_component, $a_event, $a_parameter);
+    }
+
 }
