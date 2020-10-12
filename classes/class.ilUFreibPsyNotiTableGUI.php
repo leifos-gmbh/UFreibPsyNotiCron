@@ -36,6 +36,7 @@ class ilUFreibPsyNotiTableGUI extends ilTable2GUI
         $this->addColumn($this->plugin_object->txt("scorm_object"), "scorm_ref_id");
         $this->addColumn($this->lng->txt("usrf"), "recipient_accounts");
         $this->addColumn($this->plugin_object->txt("days_to_reminder"), "reminder_after_x_days");
+        $this->addColumn($this->plugin_object->txt("subject"), "subject");
         $this->addColumn($this->lng->txt("udf_type_text"), "text");
         $this->addColumn($this->lng->txt("actions"));
 
@@ -86,6 +87,7 @@ class ilUFreibPsyNotiTableGUI extends ilTable2GUI
             $tbl_data[$n]["scorm_obj_title"] = ilObject::_lookupTitle(ilObject::_lookupObjectId($notification->getScormRefId()));
             $tbl_data[$n]["recipient_accs"]  = $notification->getRecipientAccounts();
             $tbl_data[$n]["reminder"]        = $notification->getReminderAfterXDays();
+            $tbl_data[$n]["subject"]         = $notification->getSubject();
             $tbl_data[$n]["text"]            = $notification->getText();
 
             $n++;
@@ -104,6 +106,7 @@ class ilUFreibPsyNotiTableGUI extends ilTable2GUI
         $this->tpl->setVariable("SCORM_OBJECT", $a_set["scorm_obj_title"]);
         $this->tpl->setVariable("RECIPIENT_ACCS", $a_set["recipient_accs"]);
         $this->tpl->setVariable("REMINDER", $a_set["reminder"]);
+        $this->tpl->setVariable("SUBJECT", $a_set["subject"]);
         $this->tpl->setVariable("TEXT", $a_set["text"]);
 
         $act_select = new ilAdvancedSelectionListGUI();

@@ -64,7 +64,7 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
 
         $request = $DIC->http()->request();
         $this->notification_id = (int) $request->getQueryParams()["notification_id"];
-        $this->notification_ids = $request->getQueryParams()["notification_ids"];
+        $this->notification_ids = $request->getParsedBody()["notification_ids"];
 
         $this->ctrl->saveParameter($this, "notification_id");
 
@@ -192,17 +192,14 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
 
         if (!empty($id)) {
             $notification = new ilUFreibPsyNotification($id);
-/*            $notification_id = new ilHiddenInputGUI("notification_id");
-            $notification_id->setValue($id);
-            $form->addItem($notification_id);*/
-//            var_dump($notification->getEventType());
-//            exit;
+
             $event_select->setValue($notification->getEventType());
             $repos->setValue($notification->getScormRefId());
             $recipient->setValue($notification->getRecipientType());
             $acc_list_input->setValue($notification->getRecipientAccounts());
             $reminder_day->setValue($notification->getReminderAfterXDays());
             $text->setValue($notification->getText());
+            $ti->setValue($notification->getSubject());
         }
 
         $form->addCommandButton($save_cmd, $this->lng->txt("save"));
@@ -241,7 +238,8 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
         if(!empty($form->getInput("recipient_accounts"))) {
             $notification->setRecipientAccounts($form->getInput("recipient_accounts"));
         }
-        $notification->setReminderAfterXDays($form->getInput("reminder_after_x_days"));
+        $notification->setReminderAfterXDays((int) $form->getInput("reminder_after_x_days"));
+        $notification->setSubject($form->getInput("subject"));
         $notification->setText($form->getInput("text"));
 
         //insert notification values into DB
@@ -253,7 +251,6 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
 
     private function updateNotificationSetting()
     {
-        //TODO: Bugfix: Bei Speicherversuch nach initialem Fehler durch Nichtausfüllen von Inputs, können Eingaben garnicht mehr gespeichert werden. (Speichervorgang bringt einen zurück zur Tabelle, aber ohne Update)
         $form = $this->initNotificationForm("updateNotificationSetting");
         if (!$form->checkInput()) {
             $form->setValuesByPost();
@@ -271,7 +268,8 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
         } else {
             $notification->setRecipientAccounts("");
         }
-        $notification->setReminderAfterXDays($form->getInput("reminder_after_x_days"));
+        $notification->setReminderAfterXDays((int) $form->getInput("reminder_after_x_days"));
+        $notification->setSubject($form->getInput("subject"));
         $notification->setText($form->getInput("text"));
 
         //update notification values in DB
@@ -284,15 +282,10 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
 
     public function confirmDelete()
     {
-        global $DIC;
-
-        $request = $DIC->http()->request();
-
-        $DIC->logger()->usr()->dump($request->getParsedBody());
 
         if ($this->notification_id > 0) {
             $notification_ids[] = $this->notification_id;
-        } else  {
+        } else {
             $notification_ids = $this->notification_ids;
         }
 
@@ -343,8 +336,6 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
 
     private function deleteNotification()
     {
-        global $DIC;
-
         $notification_ids = $this->notification_ids;
 
         foreach ($notification_ids as $notification_id) {

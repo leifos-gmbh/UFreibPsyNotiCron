@@ -43,6 +43,11 @@ class ilUFreibPsyNotification
     private $text;
 
     /**
+     * @var string
+     */
+    private $subject;
+
+    /**
      * ilUFreibPsyNotification constructor.
      * @param int|null $id
      */
@@ -171,6 +176,22 @@ class ilUFreibPsyNotification
         $this->text = $text;
     }
 
+    /**
+     * @return string
+     */
+    public function getSubject() : string
+    {
+        return $this->subject;
+    }
+
+    /**
+     * @param string $subject
+     */
+    public function setSubject(string $subject) : void
+    {
+        $this->subject = $subject;
+    }
+
     protected function read()
     {
         $res = $this->db->query("SELECT * FROM ufreibpsy_notification WHERE notification_id = $this->id");
@@ -181,6 +202,7 @@ class ilUFreibPsyNotification
             $this->recipient_accounts       = $row['recipient_accounts'];
             $this->reminder_after_x_days    = $row['reminder_after_x_days'];
             $this->text                     = $row['text'];
+            $this->subject                  = $row['subject'];
         }
 
     }
@@ -211,6 +233,7 @@ class ilUFreibPsyNotification
         $recipient_accounts = $quotes["recipient_accounts"];
         $reminder_after     = $quotes["reminder_after"];
         $text               = $quotes["text"];
+        $subject            = $quotes["subject"];
 
         $query = "INSERT INTO ufreibpsy_notification (notification_id, event_type, recipient_type, scorm_ref_id,";
 
@@ -218,13 +241,13 @@ class ilUFreibPsyNotification
             $query .= "recipient_accounts,";
         }
 
-        $query .= "reminder_after_x_days, text) VALUES ($id, $event_type, $recipient_type, $scorm_ref_id,";
+        $query .= "reminder_after_x_days, text, subject) VALUES ($id, $event_type, $recipient_type, $scorm_ref_id,";
 
         if(!empty($recipient_accounts)) {
             $query .= "$recipient_accounts,";
         }
 
-        $query .= "$reminder_after, $text)";
+        $query .= "$reminder_after, $text, $subject)";
 
 
         $this->db->manipulate($query);
@@ -240,6 +263,7 @@ class ilUFreibPsyNotification
         $recipient_accounts = $quotes["recipient_accounts"];
         $reminder_after     = $quotes["reminder_after"];
         $text               = $quotes["text"];
+        $subject            = $quotes["subject"];
 
         $query = "UPDATE ufreibpsy_notification SET event_type = $event_type, recipient_type = $recipient_type, scorm_ref_id = $scorm_ref_id,";
 
@@ -247,7 +271,7 @@ class ilUFreibPsyNotification
             $query .= "recipient_accounts = $recipient_accounts,";
         }
 
-        $query .= "reminder_after_x_days = $reminder_after, text = $text WHERE notification_id = $this->id";
+        $query .= "reminder_after_x_days = $reminder_after, text = $text, subject = $subject WHERE notification_id = $this->id";
 
         if(!empty($this->id)) {
             $this->db->manipulate($query);
@@ -256,10 +280,6 @@ class ilUFreibPsyNotification
 
     public function delete()
     {
-        global $DIC;
-
-        $DIC->logger()->usr()->dump($this->id);
-
         if(!empty($this->id)) {
             $this->db->manipulate("DELETE FROM ufreibpsy_notification WHERE notification_id = $this->id;");
         }
@@ -272,7 +292,8 @@ class ilUFreibPsyNotification
             "recipient_type" => $this->db->quote($this->recipient_type, "integer"),
             "scorm_ref_id"   => $this->db->quote($this->scorm_ref_id,"integer"),
             "reminder_after" => $this->db->quote($this->reminder_after_x_days, "integer"),
-            "text"           => $this->db->quote($this->text, "text")
+            "text"           => $this->db->quote($this->text, "text"),
+            "subject"        => $this->db->quote($this->subject, "text")
         ];
 
         if (is_string($this->recipient_accounts)) {

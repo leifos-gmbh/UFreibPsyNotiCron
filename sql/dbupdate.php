@@ -72,3 +72,13 @@ $ilDB->createTable("ufreibpsy_events", $event_fields);
 $ilDB->addPrimaryKey("ufreibpsy_events", array("event_id"));
 $ilDB->createSequence("ufreibpsy_events");
 ?>
+<#3>
+<?php
+if (!$ilDB->tableColumnExists('ufreibpsy_notification', 'subject')) {
+    $ilDB->addTableColumn('ufreibpsy_notification', 'subject', array(
+        'type' => 'text',
+        'notnull' => true,
+        'length' => 255
+    ));
+}
+?>
