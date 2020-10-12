@@ -18,3 +18,5 @@ recipient_accounts_info#:#Bitte fügen Sie die gewünschten Empfänger-Accounts 
 notification_saved#:#Benachrichtigung erfolgreich gespeichert
 notification_saved#:#Benachrichtigung erfolgreich gelöscht
 notification_conc_desc#:#Eventart: %s, Empfängerart: %s, SCORM Objekt: %s (ID: %s)
+subject#:#Thema
+message#:#Mitteilung

@@ -113,14 +113,20 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
         $form->setTitle($this->plugin->txt("notification_form"));
         $form->setFormAction($this->ctrl->getFormAction($this));
 
-        $event_select = new ilSelectInputGUI($this->plugin->txt("event_type"), "event_type");
+        $event_select = new ilRadioGroupInputGUI($this->plugin->txt("event_type"), "event_type");
         $event_select->setRequired(true);
-        $event_select->setOptions([
-           "" => $this->lng->txt("please_choose"),
-           ilUFreibPsyNotiPlugin::EVENT_TYPE_SCORM_ACCESS => $this->plugin->txt("scorm_access"),
-           ilUFreibPsyNotiPlugin::EVENT_TYPE_SCORM_COMPLETED => $this->plugin->txt("scorm_completed"),
-           ilUFreibPsyNotiPlugin::EVENT_TYPE_SCORM_NOT_FINISHED => $this->plugin->txt("scorm_unfinished")
-        ]);
+
+        $op1 = new ilRadioOption($this->plugin->txt("scorm_access"), ilUFreibPsyNotiPlugin::EVENT_TYPE_SCORM_ACCESS);
+        $event_select->addOption($op1);
+        $op2 = new ilRadioOption($this->plugin->txt("scorm_completed"), ilUFreibPsyNotiPlugin::EVENT_TYPE_SCORM_COMPLETED);
+        $event_select->addOption($op2);
+        $op3 = new ilRadioOption($this->plugin->txt("scorm_unfinished"), ilUFreibPsyNotiPlugin::EVENT_TYPE_SCORM_NOT_FINISHED);
+        $event_select->addOption($op3);
+        $reminder_day = new ilNumberInputGUI($this->plugin_object->txt("days_to_reminder"), "reminder_after_x_days");
+        $reminder_day->setRequired(true);
+        $reminder_day->setMaxLength(3);
+        $reminder_day->setSize(3);
+        $op3->addSubItem($reminder_day);
 
         $form->addItem($event_select);
 
@@ -158,12 +164,15 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
         $recipient->addOption($accounts);
         $form->addItem($recipient);
 
-        $reminder_day = new ilNumberInputGUI($this->plugin_object->txt("days_to_reminder"), "reminder_after_x_days");
-        $reminder_day->setRequired(true);
-        $form->addItem($reminder_day);
+        // subject
+        $ti = new ilTextInputGUI($this->plugin->txt("subject"), "subject");
+        $ti->setRequired(true);
+        $form->addItem($ti);
 
-        $text = new ilTextAreaInputGUI($this->lng->txt("udf_type_text"), "text");
+        // message
+        $text = new ilTextAreaInputGUI($this->plugin->txt("message"), "text");
         $text->setRequired(true);
+        $text->setRows(10);
         $form->addItem($text);
 
         if (!empty($id)) {
@@ -171,7 +180,8 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
             $notification_id = new ilHiddenInputGUI("notification_id");
             $notification_id->setValue($id);
             $form->addItem($notification_id);
-
+//            var_dump($notification->getEventType());
+//            exit;
             $event_select->setValue($notification->getEventType());
             $repos->setValue($notification->getScormRefId());
             $recipient->setValue($notification->getRecipientType());
