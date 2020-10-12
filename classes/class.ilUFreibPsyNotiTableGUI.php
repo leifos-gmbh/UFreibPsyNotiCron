@@ -4,12 +4,21 @@ class ilUFreibPsyNotiTableGUI extends ilTable2GUI
 {
     private $plugin_object;
 
+
     function __construct($a_parent_obj, $a_parent_cmd, $plugin_object)
     {
+        global $DIC;
+
+        $this->ctrl = $DIC->ctrl();
+
         $this->plugin_object = $plugin_object;
 
-        $this->setId("ilUFreibPsyNotiTableGUI");
+        $this->setId("ubreibnoti");
         parent::__construct($a_parent_obj, $a_parent_cmd);
+
+        $this->setSelectAllCheckbox("notification_ids[]");
+        $this->addMultiCommand("confirmDelete", $this->lng->txt("delete"));
+        $this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
 
         $this->initNotificationTable();
         $this->setTableData();

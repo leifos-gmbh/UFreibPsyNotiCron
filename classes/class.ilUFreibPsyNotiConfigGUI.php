@@ -40,6 +40,16 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
     protected $toolbar;
 
     /**
+     * @var int
+     */
+    protected $notification_id;
+
+    /**
+     * @var array
+     */
+    protected $notification_ids;
+
+    /**
      * Handles all commmands, default is "configure"
      */
     function performCommand($cmd)
@@ -51,6 +61,12 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
         $this->lng        = $DIC->language();
         $this->plugin     = $this->getPluginObject();
         $this->toolbar    = $DIC->toolbar();
+
+        $request = $DIC->http()->request();
+        $this->notification_id = (int) $request->getQueryParams()["notification_id"];
+        $this->notification_ids = $request->getQueryParams()["notification_ids"];
+
+        $this->ctrl->saveParameter($this, "notification_id");
 
         $this->settings = new ilSetting("ufreibpsynoti");
 
@@ -99,8 +115,7 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
         $request = $DIC->http()->request();
 
         if (is_null($form)) {
-            $notification_id = $request->getQueryParams()["notification_id"];
-            $form = $this->initNotificationForm("updateNotificationSetting", $notification_id);
+            $form = $this->initNotificationForm("updateNotificationSetting", $this->notification_id);
         }
         $this->main_tpl->setContent($form->getHTML());
     }
@@ -177,9 +192,9 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
 
         if (!empty($id)) {
             $notification = new ilUFreibPsyNotification($id);
-            $notification_id = new ilHiddenInputGUI("notification_id");
+/*            $notification_id = new ilHiddenInputGUI("notification_id");
             $notification_id->setValue($id);
-            $form->addItem($notification_id);
+            $form->addItem($notification_id);*/
 //            var_dump($notification->getEventType());
 //            exit;
             $event_select->setValue($notification->getEventType());
@@ -204,9 +219,6 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
         $this->toolbar->addButtonInstance($button);
 
         $table = new ilUFreibPsyNotiTableGUI($this, "listNotifications", $this->plugin_object);
-        //TODO: Checkbox und Command wollen nicht funktionieren.
-        $table->setSelectAllCheckbox("notifications");
-        $table->addMultiCommand("confirmDelete", $this->lng->txt("delete"));
 
         $this->main_tpl->setContent($table->getHTML());
     }
@@ -250,7 +262,7 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
         }
 
         //initiate notification instance and set values
-        $notification = new ilUFreibPsyNotification($form->getInput("notification_id"));
+        $notification = new ilUFreibPsyNotification($this->notification_id);
         $notification->setEventType($form->getInput("event_type"));
         $notification->setRecipientType($form->getInput("recipient_type"));
         $notification->setScormRefId($form->getInput("scorm_ref_id"));
@@ -278,7 +290,11 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
 
         $DIC->logger()->usr()->dump($request->getParsedBody());
 
-        $notification_ids[] = $request->getQueryParams()["notification_id"];
+        if ($this->notification_id > 0) {
+            $notification_ids[] = $this->notification_id;
+        } else  {
+            $notification_ids = $this->notification_ids;
+        }
 
         $cgui = new ilConfirmationGUI();
         $cgui->setFormAction($this->ctrl->getFormAction($this));
@@ -316,7 +332,7 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
 
             $scorm_obj_title = ilObject::_lookupTitle(ilObject::_lookupObjectId($notification->getScormRefId()));
 
-            $cgui->addItem("notification_id[]", $notification_id, sprintf($this->plugin_object->txt("notification_conc_desc"), $event_type, $recipient_type, $scorm_obj_title, $notification_id));
+            $cgui->addItem("notification_ids[]", $notification_id, sprintf($this->plugin_object->txt("notification_conc_desc"), $event_type, $recipient_type, $scorm_obj_title, $notification_id));
         }
         $cgui->setCancel($this->lng->txt("cancel"), "listNotifications");
         $cgui->setConfirm($this->lng->txt("delete"), "deleteNotification");
@@ -329,9 +345,7 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
     {
         global $DIC;
 
-        $request = $DIC->http()->request();
-
-        $notification_ids = $request->getParsedBody()['notification_id'];
+        $notification_ids = $this->notification_ids;
 
         foreach ($notification_ids as $notification_id) {
             $notification = new ilUFreibPsyNotification($notification_id);
