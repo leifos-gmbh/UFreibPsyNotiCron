@@ -87,11 +87,10 @@ class ilUFreibPsyNotiCronjob extends ilCronJob
         $handler = new ilUFreibEventHandler($plugin);
 
 
-        // @todo: loop for all EVENT_TYPE_SCORM_NOT_FINISHED
-
-
-        foreach ($access_repo->getUserToNotify($days, $scorm_ref_id) as $student_id) {
-            // @todo: send mail using $handler->sendMail();
+        foreach (ilUFreibPsyNotification::_query(ilUFreibPsyNotiPlugin::EVENT_TYPE_SCORM_NOT_FINISHED) as $noti) {
+            foreach ($access_repo->getUserToNotify($noti->getReminderAfterXDays(), $noti->getScormRefId()) as $student_id) {
+                $handler->sendNotification($noti, $student_id);
+            }
         }
 
 

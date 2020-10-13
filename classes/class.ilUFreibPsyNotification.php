@@ -275,6 +275,21 @@ class ilUFreibPsyNotification
 
         if(!empty($this->id)) {
             $this->db->manipulate($query);
+
+            // note: better use db->update
+            /*
+            $db->update(
+                "ufreibpsy_notification",
+                [
+                    "event_type" => ["integer", $this->event_type],
+                    "recipient_type" => ["integer", $this->recipient_type],
+                    ...
+                ],
+                [    // where
+                     "notification_id" => ["integer", $this->id]
+                ]
+            );
+            */
         }
     }
 
@@ -302,9 +317,37 @@ class ilUFreibPsyNotification
             $quoted_values['recipient_accounts'] = null;
         }
 
-
         return $quoted_values;
 
+    }
+
+    /**
+     * Note: This is not good practice, better would be a repository class for all db access to
+     * ufreibpsy_notification table
+     * @param int $event_type
+     * @param int $scorm_ref_id
+     * @return ilUFreibPsyNotification[]
+     */
+    static public function _query(int $event_type, int $scorm_ref_id = 0)
+    {
+        global $DIC;
+
+        $db = $DIC->database();
+
+
+        $query = "SELECT id FROM ufreibpsy_notification " .
+            " WHERE event_type = ".$db->quote($event_type, "integer");
+
+        if ($scorm_ref_id > 0) {
+            $query.= " AND scorm_ref_id = ".$db->quote($scorm_ref_id, "integer");
+        }
+
+        $set = $db->query($query);
+        $notifications = [];
+        while ($rec = $db->fetchAssoc($set)) {
+            $notifications[] = new self($rec["id"]);
+        }
+        return $notifications;
     }
 
 }
