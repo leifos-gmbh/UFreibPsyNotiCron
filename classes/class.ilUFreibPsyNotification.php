@@ -335,7 +335,7 @@ class ilUFreibPsyNotification
         $db = $DIC->database();
 
 
-        $query = "SELECT id FROM ufreibpsy_notification " .
+        $query = "SELECT notification_id FROM ufreibpsy_notification " .
             " WHERE event_type = ".$db->quote($event_type, "integer");
 
         if ($scorm_ref_id > 0) {
@@ -345,8 +345,9 @@ class ilUFreibPsyNotification
         $set = $db->query($query);
         $notifications = [];
         while ($rec = $db->fetchAssoc($set)) {
-            $notifications[] = new self($rec["id"]);
+            $notifications[] = new self($rec["notification_id"]);
         }
+
         return $notifications;
     }
 

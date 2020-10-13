@@ -37,7 +37,7 @@ class ilUFreibEventHandler
         $this->plugin = $plugin;
         $this->rbacreview = $DIC->rbac()->review();
         $this->access = $DIC->access();
-        $this->plugin->includeClass("class.ilUFreibPsyNotiAccesRepository.php");
+        $this->plugin->includeClass("class.ilUFreibPsyNotiAccessRepository.php");
         $this->access_repo = new ilUFreibPsyNotiAccessRepository();
     }
 
