@@ -122,3 +122,18 @@ if (!$ilDB->tableColumnExists('ufreibpsy_events', 'completed')) {
     ));
 }
 ?>
+<#6>
+<?php
+if (!$ilDB->tableColumnExists('ufreibpsy_access_store', 'completed')) {
+    $ilDB->addTableColumn('ufreibpsy_access_store', 'completed', array(
+        'type' => 'integer',
+        'notnull' => false,
+        'length' => 1,
+        'default' => 0
+    ));
+}
+?>
+<#7>
+<?php
+    $ilDB->dropTable('ufreibpsy_events');
+?>
