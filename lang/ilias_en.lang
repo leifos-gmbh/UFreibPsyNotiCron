@@ -1,4 +1,5 @@
 <!-- language file start -->
+cron_job_info#:#Sends the reminders configured in the plugin about incomplete SCORM modules in the set time frame
 notification_id#:#Notification-ID
 event_type#:#Event type
 recipient_type#:#Recipient type

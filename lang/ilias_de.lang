@@ -1,4 +1,5 @@
 <!-- language file start -->
+cron_job_info#:#Sendet die im Plugin konfigurierten Erinnerungen über nicht abgeschlossene SCORM-Module im eingestellten Zeitrahmen ab
 notification_id#:#Benachrichtigungs-ID
 event_type#:#Eventart
 recipient_type#:#Empfängerart
