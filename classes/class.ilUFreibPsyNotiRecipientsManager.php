@@ -73,7 +73,7 @@ class ilUFreibPsyNotiRecipientsManager
         $udf_userdata = $user->getUserDefinedData();
 
         $userDefinedFields = ilUserDefinedFields::_getInstance();
-        $udf_definitions = $userDefinedFields->getVisibleDefinitions();
+        $udf_definitions = $userDefinedFields->getDefinitions();
 
         if(!empty($udf_definitions))
         {
@@ -104,6 +104,4 @@ class ilUFreibPsyNotiRecipientsManager
 
         return $coach_ids;
     }
-
-
 }

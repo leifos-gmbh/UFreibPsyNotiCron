@@ -28,6 +28,8 @@ class ilUFreibEventHandler
      */
     protected $access_repo;
 
+    protected $handled = [];
+
     /**
      * Constructor
      */
@@ -39,6 +41,8 @@ class ilUFreibEventHandler
         $this->access = $DIC->access();
         $this->plugin->includeClass("class.ilUFreibPsyNotiAccessRepository.php");
         $this->access_repo = new ilUFreibPsyNotiAccessRepository();
+
+        $this->log = ilLoggerFactory::getLogger("mail");
     }
 
     public function handleEvent($a_component, $a_event, $a_parameter)
@@ -105,10 +109,20 @@ class ilUFreibEventHandler
         $usr_id = $par["usr_id"];
         $status = $par["status"];
         $old_status = $par["old_status"];
+        $this->log->debug("---");
+        $this->log->logStack(ilLogLevel::DEBUG);
+        $this->log->debug($obj_id);
+        $this->log->debug($usr_id);
+        $this->log->debug($status);
+        $this->log->debug($old_status);
         if ($status == ilLPStatus::LP_STATUS_COMPLETED_NUM && $old_status != ilLPStatus::LP_STATUS_COMPLETED_NUM) {
             if (ilObject::_lookupType($obj_id) == "sahs") {
                 foreach (ilObject::_getAllReferences($obj_id) as $scorm_ref_id) {
-                    $this->sendCompletedNotifications($usr_id, $scorm_ref_id);
+                    if (!ilObject::_isInTrash($scorm_ref_id) && !isset($this->handled[$scorm_ref_id."-".$usr_id])) {
+                        $this->handled[$scorm_ref_id."-".$usr_id] = true;
+                        $this->log->debug("***");
+                        $this->sendCompletedNotifications($usr_id, $scorm_ref_id);
+                    }
                 }
             }
         }
