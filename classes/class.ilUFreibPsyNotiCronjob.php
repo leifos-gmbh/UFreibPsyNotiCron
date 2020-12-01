@@ -78,6 +78,8 @@ class ilUFreibPsyNotiCronjob extends ilCronJob
      */
     public function run()
     {
+        $log = ilLoggerFactory::getLogger("mail");
+
         $result = new ilCronJobResult();
 
         $plugin = $this->getPlugin();
@@ -86,9 +88,12 @@ class ilUFreibPsyNotiCronjob extends ilCronJob
         $plugin->includeClass("class.ilUFreibPsyNotiAccessRepository.php");
         $handler = new ilUFreibEventHandler($plugin);
 
+        $log->debug("--- ilUFreibPsyNoti start");
 
         foreach (ilUFreibPsyNotification::_query(ilUFreibPsyNotiPlugin::EVENT_TYPE_SCORM_NOT_FINISHED) as $noti) {
+            $log->debug("--- noti: ".$noti->getId());
             foreach ($access_repo->getUserToNotify($noti->getReminderAfterXDays(), $noti->getScormRefId()) as $student_id) {
+                $log->debug("--- student: ".$student_id);
                 $handler->sendNotification($noti, $student_id);
             }
         }
