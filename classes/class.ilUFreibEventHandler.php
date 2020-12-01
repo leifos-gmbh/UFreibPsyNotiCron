@@ -61,24 +61,35 @@ class ilUFreibEventHandler
      */
     protected function handleAssignUserEvent($par)
     {
+        global $DIC;
+
+        $rbacsystem = $DIC->rbac()->system();
         $rbacreview = $this->rbacreview;
         $access = $this->access;
 
+        $this->log->debug("-handleAssignUser-1");
         $obj_id = $par['obj_id'];
         $usr_id = $par['usr_id'];
         $role_id = $par['role_id'];
         $type = $par['type'];
-
         // has user been assigned to a role of a scorm object?
         if ($type == "sahs") {
+            $this->log->debug("-handleAssignUser-2");
             $ref_id = $rbacreview->getObjectReferenceOfRole($role_id);
 
+            $this->log->debug("-checking-role_id-$role_id-ref_id-$ref_id-usr_id-$usr_id-");
+
             // we check, if the user has read access to the object now
+            // important: clear all the caches, otherwise this may return the wrong result
+            $access->clear();
+            $rbacsystem->resetCaches();
             if ($access->checkAccessOfUser($usr_id, "read", "", $ref_id)) {
+                $this->log->debug("-handleAssignUser-3");
 
                 // we store the access granted timestamp and send notifications, if
                 // we did not store and sent already
                 if ($this->access_repo->getAccessGrantedTS($usr_id, $ref_id) == 0) {
+                    $this->log->debug("-handleAssignUser-4");
                     $this->sendAccessNotifications($usr_id, $ref_id);
                     $this->access_repo->storeAccessGranted($usr_id, $ref_id);
                 }
@@ -118,10 +129,11 @@ class ilUFreibEventHandler
         if ($status == ilLPStatus::LP_STATUS_COMPLETED_NUM && $old_status != ilLPStatus::LP_STATUS_COMPLETED_NUM) {
             if (ilObject::_lookupType($obj_id) == "sahs") {
                 foreach (ilObject::_getAllReferences($obj_id) as $scorm_ref_id) {
-                    if (!ilObject::_isInTrash($scorm_ref_id) && !isset($this->handled[$scorm_ref_id."-".$usr_id])) {
-                        $this->handled[$scorm_ref_id."-".$usr_id] = true;
-                        $this->log->debug("***");
-                        $this->sendCompletedNotifications($usr_id, $scorm_ref_id);
+                    if (!ilObject::_isInTrash($scorm_ref_id)) {
+                        if ($this->access_repo->storeCompletedTS($usr_id, $scorm_ref_id)) {
+                            $this->log->debug("***");
+                            $this->sendCompletedNotifications($usr_id, $scorm_ref_id);
+                        }
                     }
                 }
             }
@@ -172,14 +184,18 @@ class ilUFreibEventHandler
             ->withContextId('')
             ->withContextParameters([]);
         $mailer->setSaveInSentbox(false);
-        $mailer->enqueue(
-            ilUtil::securePlainString(ilObjUser::_lookupLogin((int) $recipient_id)),
-            "",
-            "",
-            ilUtil::securePlainString($subject),
-            $sanitizedMessage,
-            [],
-            null
-        );
+        //$email = trim(ilObjUser::_lookupEmail((int) $recipient_id));
+        $email = trim(ilObjUser::_lookupLogin((int) $recipient_id));
+        if ($email != "") {
+            $mailer->enqueue(
+                ilUtil::securePlainString($email),
+                "",
+                "",
+                ilUtil::securePlainString($subject),
+                $sanitizedMessage,
+                [],
+                null
+            );
+        }
     }
 }

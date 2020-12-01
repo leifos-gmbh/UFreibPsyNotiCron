@@ -45,6 +45,27 @@ class ilUFreibPsyNotiAccessRepository
     }
 
     /**
+     * @param int $user_id
+     * @param int $ref_id
+     */
+    public function storeCompletedTS(int $user_id, int $ref_id) {
+        $db = $this->db;
+
+        $r = $db->update(
+            "ufreibpsy_access_store",
+            [
+                "completed_ts" => ["integer", time()]
+            ],
+            [ // where
+              "user_id" => ["integer", $user_id],
+              "scorm_ref_id" => ["integer", $ref_id],
+              "completed_ts" => ["integer", 0]
+            ]
+        );
+        return ($r > 0);
+    }
+
+    /**
      * Get access granted timestamp
      * @param int $user_id
      * @param int $ref_id

@@ -137,3 +137,14 @@ if (!$ilDB->tableColumnExists('ufreibpsy_access_store', 'completed')) {
 <?php
     $ilDB->dropTable('ufreibpsy_events');
 ?>
+<#8>
+<?php
+if (!$ilDB->tableColumnExists('ufreibpsy_access_store', 'completed_ts')) {
+    $ilDB->addTableColumn('ufreibpsy_access_store', 'completed_ts', array(
+        'type' => 'integer',
+        'notnull' => false,
+        'length' => 4,
+        'default' => 0
+    ));
+}
+?>
