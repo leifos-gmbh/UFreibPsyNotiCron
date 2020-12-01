@@ -184,8 +184,8 @@ class ilUFreibEventHandler
             ->withContextId('')
             ->withContextParameters([]);
         $mailer->setSaveInSentbox(false);
-        //$email = trim(ilObjUser::_lookupEmail((int) $recipient_id));
-        $email = trim(ilObjUser::_lookupLogin((int) $recipient_id));
+        $email = trim(ilObjUser::_lookupEmail((int) $recipient_id));
+        //$email = trim(ilObjUser::_lookupLogin((int) $recipient_id));
         if ($email != "") {
             $mailer->enqueue(
                 ilUtil::securePlainString($email),
