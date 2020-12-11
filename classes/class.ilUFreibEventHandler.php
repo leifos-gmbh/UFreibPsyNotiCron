@@ -53,7 +53,40 @@ class ilUFreibEventHandler
         if ($a_component == "Services/Tracking" && $a_event == "updateStatus") {
             $this->handleUpdateStatusEvent($a_parameter);
         }
+        if ($a_component == "Services/Mail" && $a_event == "freibFeedbackSent") {
+            $this->log->debug("----*** handleFeedbackEvent (1) ");
+            $this->handleFeedbackEvent($a_parameter);
+        }
     }
+
+    /**
+     * handle role assignment
+     * @param array $par
+     */
+    protected function handleFeedbackEvent($par)
+    {
+        $scorm_ref_id = $par["scorm_ref_id"];
+        $usr_id = $par["student_id"];
+        if (!ilObject::_isInTrash($scorm_ref_id)) {
+            $this->log->debug("----*** handleFeedbackEvent (2) $usr_id, $scorm_ref_id");
+            $this->sendFeedbackNotifications($usr_id, $scorm_ref_id);
+        }
+    }
+
+    /**
+     * Send feedback notifications
+     * @param $usr_id
+     * @param $ref_id
+     */
+    protected function sendFeedbackNotifications($usr_id, $ref_id)
+    {
+        $this->plugin->includeClass("class.ilUFreibPsyNotification.php");
+        foreach (ilUFreibPsyNotification::_query(ilUFreibPsyNotiPlugin::EVENT_TYPE_FEEDBACK_SENT, $ref_id) as $noti) {
+            $this->log->debug("----*** handleFeedbackEvent (3) ");
+            $this->sendNotification($noti, $usr_id);
+        }
+    }
+
 
     /**
      * handle role assignment
@@ -187,6 +220,7 @@ class ilUFreibEventHandler
         $email = trim(ilObjUser::_lookupEmail((int) $recipient_id));
         //$email = trim(ilObjUser::_lookupLogin((int) $recipient_id));
         if ($email != "") {
+            $this->log->debug("----*** sent to $email -".$subject);
             $mailer->enqueue(
                 ilUtil::securePlainString($email),
                 "",

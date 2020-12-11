@@ -3,5 +3,6 @@
     <events>
         <event type="listen" id="Services/AccessControl" />
         <event type="listen" id="Services/Tracking" />
+        <event type="listen" id="Services/Mail" />
     </events>
 </plugin>

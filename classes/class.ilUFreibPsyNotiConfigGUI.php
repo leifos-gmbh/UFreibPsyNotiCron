@@ -137,6 +137,8 @@ class ilUFreibPsyNotiConfigGUI extends ilPluginConfigGUI
         $event_select->addOption($op2);
         $op3 = new ilRadioOption($this->plugin->txt("scorm_unfinished"), ilUFreibPsyNotiPlugin::EVENT_TYPE_SCORM_NOT_FINISHED);
         $event_select->addOption($op3);
+        $op4 = new ilRadioOption($this->plugin->txt("feedback_sent"), ilUFreibPsyNotiPlugin::EVENT_TYPE_FEEDBACK_SENT);
+        $event_select->addOption($op4);
         $reminder_day = new ilNumberInputGUI($this->plugin_object->txt("days_to_reminder"), "reminder_after_x_days");
         $reminder_day->setRequired(true);
         $reminder_day->setMaxLength(3);

@@ -341,13 +341,11 @@ class ilUFreibPsyNotification
         if ($scorm_ref_id > 0) {
             $query.= " AND scorm_ref_id = ".$db->quote($scorm_ref_id, "integer");
         }
-
         $set = $db->query($query);
         $notifications = [];
         while ($rec = $db->fetchAssoc($set)) {
             $notifications[] = new self($rec["notification_id"]);
         }
-
         return $notifications;
     }
 

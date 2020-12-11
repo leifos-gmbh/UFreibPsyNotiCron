@@ -21,3 +21,4 @@ notification_saved#:#Notification successfully deleted
 notification_conc_desc#:#Event-Type: %s, Recipient-Type: %s, SCORM object: %s (ID: %s)
 subject#:#Subject
 message#:#Message
+feedback_sent#:#Feedback sent

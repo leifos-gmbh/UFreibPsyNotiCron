@@ -11,6 +11,7 @@ class ilUFreibPsyNotiPlugin extends ilCronHookPlugin
     const EVENT_TYPE_SCORM_ACCESS = 1;
     const EVENT_TYPE_SCORM_COMPLETED = 2;
     const EVENT_TYPE_SCORM_NOT_FINISHED = 3;
+    const EVENT_TYPE_FEEDBACK_SENT = 4;
     const RECIPIENT_TYPE_STUDENT = 1;
     const RECIPIENT_TYPE_ECOACHES = 2;
     const RECIPIENT_TYPE_ACCOUNTS = 3;

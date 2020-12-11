@@ -21,3 +21,4 @@ notification_saved#:#Benachrichtigung erfolgreich gelöscht
 notification_conc_desc#:#Eventart: %s, Empfängerart: %s, SCORM Objekt: %s (ID: %s)
 subject#:#Thema
 message#:#Mitteilung
+feedback_sent#:#Feedback gesendet

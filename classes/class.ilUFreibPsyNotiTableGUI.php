@@ -66,6 +66,9 @@ class ilUFreibPsyNotiTableGUI extends ilTable2GUI
                 case ilUFreibPsyNotiPlugin::EVENT_TYPE_SCORM_NOT_FINISHED:
                     $tbl_data[$n]['event_type'] = $this->plugin_object->txt("scorm_unfinished");
                     break;
+                case ilUFreibPsyNotiPlugin::EVENT_TYPE_FEEDBACK_SENT:
+                    $tbl_data[$n]['event_type'] = $this->plugin_object->txt("feedback_sent");
+                    break;
                 default:
                     break;
             }
